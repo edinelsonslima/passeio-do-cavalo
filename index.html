@@ -1,0 +1,190 @@
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="./horse-color.webp" type="image/x-icon">
+    <title>Desafio Passeio do Cavalo</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+
+            background: url("https://www.teahub.io/photos/full/255-2551052_historia-do-xadrez-como-surgiu.jpg");
+            background-size: cover;
+            width: 400px;
+            margin: auto;
+            position: relative;
+        }
+
+        h1 {
+            color:#FBD1A2;
+            text-shadow: 1px 1px 1px black;
+            text-align: center;
+            margin-top: 60px;
+            font-size: 2.5rem;
+        }
+
+        button{
+            position: absolute;
+            top: 650px;
+            border: 1px solid #9B866B;
+            border-radius: 7px;
+            padding: 7px;
+
+            background: #4D4844;
+            color: white;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        button:hover{
+            background: #302d2a;
+        }
+
+        button:active{
+            transform: translateY(2px);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            color: white;
+            text-align: center;
+            text-shadow: 1px 1px 2px #1C1B16;
+
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Passei do cavalo</h1>
+    <button onclick="reload()">Reiniciar</button>
+    <footer>&copy;Edinelson Lima</footer>
+
+
+    <!-- Lógica implementada com javascript -->
+    <script>
+        const drawBoard = side => {
+            const knight = document.createElement('img');
+            for (let r = 0; r < 8; ++r)
+                for (let c = 0; c < 8; ++c) {
+                    const square = document.createElement('div');
+                    var even = (r + c) % 2 == 0;
+                    square.className = `${r}-${c}`;
+                    square.style.backgroundColor = even ? '#9B866B' : '#4D4844';
+                    square.style.color = even ? 'black' : 'white';
+                    square.style.textShadow = "1px 1px 1px black"
+                    square.style.height = side;
+                    square.style.left = side * c;
+                    square.style.position = 'absolute';
+                    square.style.textAlign = 'center';
+                    square.style.lineHeight = `${side}px`;
+                    square.style.top = 50 * r;
+                    square.style.width = side;
+                    square.style.zIndex = 0;
+                    square.style.margin = "200px 0"
+                    square.style.border = "2px solid black"
+
+                    document.body.appendChild(square);
+                }
+
+
+            knight.src = "horse-color.webp"
+            knight.style.height = "32px";
+            knight.style.left = 8;
+            knight.style.position = 'absolute';
+            knight.style.top = 8;
+            knight.style.width = "32px";
+            knight.style.zIndex = 1;
+            knight.style.margin = "200px 0"
+            document.body.appendChild(knight);
+        }
+
+        const withinBounds = i => i > -1 && i < 8;
+
+        const countOutboundMoves = (board, r, c, moves) => {
+            board[r][c] = 0;
+            for (let move of moves)
+                if (withinBounds(move.r + r) && withinBounds(move.c + c))
+                    board[r][c] += 1;
+        }
+
+        const initBoardState = moves => {
+
+            const board = new Array(8);
+            for (let r = 0; r < 8; ++r)
+                board[r] = new Array(8);
+
+            for (let r = 0; r < 8; ++r)
+                for (let c = 0; c < 8; ++c)
+                    countOutboundMoves(board, r, c, moves);
+
+            return board;
+        }
+
+        const tour = (r, c, moves, moveNumber, board, side) => {
+
+            if (moveNumber > 64)
+                return;
+
+            let nextR = 0, nextC = 0, minOutbound = 9;
+
+            for (let move of moves) {
+                const candidateR = move.r + r;
+                const candidateC = move.c + c;
+                if (withinBounds(candidateR) && withinBounds(candidateC) && board[candidateR][candidateC] < minOutbound) {
+                    minOutbound = board[candidateR][candidateC];
+                    nextR = candidateR;
+                    nextC = candidateC;
+                }
+            }
+
+            board[r][c] = 100;
+
+            for (let move of moves) {
+                const neighborR = move.r + r;
+                const neighborC = move.c + c;
+                if (withinBounds(neighborR) && withinBounds(neighborC)) {
+                    board[neighborR][neighborC]--;
+                }
+            }
+
+
+            document.getElementsByClassName(`${r}-${c}`)[0].textContent = moveNumber;
+            const knight = document.getElementsByTagName('img')[0];
+            knight.style.top = r * side + 8;
+            knight.style.left = c * side + 8;
+
+
+
+            setTimeout(() => {
+                tour(nextR, nextC, moves, moveNumber + 1, board, side);
+            }, 500);
+        }
+        
+        function reload() {
+            location.reload(true)
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const moves = [
+                { r: -2, c: -1 },
+                { r: -2, c: 1 },
+                { r: 2, c: -1 },
+                { r: 2, c: 1 },
+                { r: -1, c: -2 },
+                { r: -1, c: 2 },
+                { r: 1, c: -2 },
+                { r: 1, c: 2 },
+            ];
+            const side = 50;
+
+            drawBoard(side);
+            const board = initBoardState(moves);
+            tour(0, 0, moves, 1, board, side);
+        });
+
+    </script>
+</body>
+
+</html>
