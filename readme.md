@@ -1,6 +1,6 @@
 <h1 align="center">PASSEIO DO CAVALO </h1>
 <div align="center"> 
-   <img width="1000px" height="500px"  src="./passei-do-cavalo.gif"/>
+   <img width="1000px" height="500px"  src="./passeio-do-cavalo.gif"/>
 </div>
 <hr>
 <br>
